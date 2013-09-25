@@ -1,0 +1,101 @@
+Name     TrabRam ;
+PartNo   00 ;
+Date     20-05-2009 ;
+Revision 01 ;
+Designer Engineer ;
+Company  CCISEL ;
+Assembly None ;
+Location  ;
+Device   v750c ;
+
+/* *************** INPUT PINS *********************/
+PIN   1  = MCLK                        ; /*                                 */ 
+PIN   2  = Kval                        ; /*                                 */ 
+PIN   3  = NXT                        ; /*                                 */ 
+/*PIN 4 = UP;*/
+
+
+/* *************** OUTPUT PINS *********************/
+PIN   14  =  C0                       ; /*                                 */ 
+PIN   15  =  Q1                       ; /*                                 */ 
+PIN   16  =  Q2                       ; /*                                 */ 
+PIN   17  =   Coisas                      ; /*                                 */ 
+PIN   18  =  G2                       ; /*                                 */ 
+PIN   19  =  UP                       ; /*                                 */ 
+PIN   20  =  G0                       ; /*                                 */ 
+PIN   21  =  WR                       ; /*                                 */ 
+PIN   22  =  G1                       ; /*                                 */ 
+PIN   23  =  !OE                       ; /*                                 */ 
+/* *************** PINNODES    *********************/
+PINNODE   28  = C1                     ; /*                                 */ 
+PINNODE   27  =   P0                   ; /*                                 */ 
+PINNODE   30  =   P1                   ; /*                                 */ 
+PINNODE   32  =    Q0                  ; /*                                 */ 
+PINNODE   38  =    P2                  ; /*                                 */ 
+PINNODE   35  =    C2                  ; /*                                 */ 
+
+
+[C0..2].ckmux= MCLK;
+[C0..2].ar='b'0;
+[C0..2].sp='b'0;
+
+[G0..2].ckmux= MCLK;
+[G0..2].ar='b'0;
+[G0..2].sp='b'0;
+
+
+[P0..2].ckmux= MCLK;
+[P0..2].ar='b'0;
+[P0..2].sp='b'0;
+
+C0.d=!C0;
+C1.d=C1 $(C0&COUNT1);
+C2.d=C2 $ (C1&C0&COUNT1);
+
+G0.d=!G0;
+G1.d=G1$(G0&COUNT2);
+G2.d=G2$(G1&G0&COUNT2);
+
+P0.d=!P0;
+P1.d=P1$((P0$UP)&INC);
+P2.d=((P2$(P1&P0)&!UP)) # ((P2$(!P1&!P0))&UP);
+
+Empty=!P0&!P1&!P2;
+Full= P0&P1&P2;
+
+[Q0..2].ck= MCLK;
+[Q0..2].ar='b'0;
+[Q0..2].sp='b'0;
+
+
+SEQUENCE [Q0,Q1,Q2]{
+PRESENT 0
+IF Kval & NXT next 1;
+IF Kval & !NXT next 0;
+default next 2;
+
+PRESENT 1 
+IF Empty next 0;
+default next 4;
+
+PRESENT 2
+IF Full & NXT next 1;
+IF Full & !NXT  next 2;
+default next 3;
+
+PRESENT 3
+OUT  INC,WR,COUNT2;
+default NEXT 6 ;
+
+PRESENT 4
+OUT UP,OE , INC, COUNT1,CE;
+default NEXT 5;
+
+PRESENT 5
+OUT OE, CE;
+default NEXT 0;
+
+PRESENT 6
+OUT CE;
+default NEXT 0;
+}

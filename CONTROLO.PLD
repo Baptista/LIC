@@ -1,0 +1,97 @@
+Name     Controlo ;
+PartNo   00 ;
+Date     22-09-2009 ;
+Revision 01 ;
+Designer Engineer ;
+Company  CCISEL ;
+Assembly None ;
+Location  ;
+Device   v750c ;
+
+PIN 1 = MCLK;
+PIN 2 = Kval;
+PIN 3 = NXT;
+
+
+PIN 14 = WR;
+PIN 15 = CE;
+PIN 16 = P0;
+PIN 17 = P1;
+PIN 18 = P2;
+PIN 19 = up;
+PIN 20 = Q1;
+PIN 21 = Q0;
+PIN 22 = !OE;
+PIN 23 = COUNT;
+
+PINNODE 42 = Q2;
+
+
+
+[P0..2].ck=COUNT;
+[P0..2].ar='b'0;
+[P0..2].sp='b'0;
+
+P0.d =!P0;
+P1.d=(P0$P1$UP);
+P2.d=((((P1&P0)$P2)&!UP)#(((!P1&!P0)$P2)&UP));
+
+EMPTY = !P2&!P1&!P0;
+FULL = P2&P1&P0;
+
+/*
+
+[C0..2].ckmux= MCLK;
+[C0..2].ar='b'0;
+[C0..2].sp='b'0;
+
+
+C0.d=!C0 $ !CLKP;
+C1.d=(C1$C0)&CLKP# C1.dfb & !CLKP ;
+C2.d=(C2 $ (C1&C0))&CLKP# C2.dfb&!CLKP ;
+
+[G0..2].ckmux= MCLK;
+[G0..2].ar='b'0;
+[G0..2].sp='b'0;
+
+G0.d=!G0 $ !CLKG;
+G1.d=(G1$G0) & CLKG # G1.dfb&!CLKG;
+G2.d=(G2$(G1&G0))&CLKG # G2.dfb& !CLKG;
+*/
+/*alterar a partir daki pa ultima versao*/
+[Q0..2].ckmux= MCLK;
+[Q0..2].ar='b'0;
+[Q0..2].sp='b'0;
+
+
+SEQUENCE [Q2,Q1,Q0]{
+PRESENT 0
+IF Kval & NXT NEXT 1;
+IF Kval & !NXT NEXT 0;
+DEFAULT NEXT 2;
+
+PRESENT 1
+IF EMPTY NEXT 0;
+DEFAULT NEXT  4;
+
+PRESENT 2
+IF FULL & NXT NEXT 1;
+IF FULL & !NXT NEXT 2;
+DEFAULT NEXT 3;
+
+PRESENT 5
+OUT  WR,CE,COUNT ,CLKP;
+DEFAULT NEXT 6 ;
+
+PRESENT  4
+OUT OE ,  CE,COUNT,UP,CLKG ;
+DEFAULT NEXT 3;
+
+PRESENT 3
+OUT OE, CE ;
+DEFAULT NEXT 0;
+
+PRESENT 6
+OUT CE ;
+DEFAULT NEXT 0;
+}

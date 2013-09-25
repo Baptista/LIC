@@ -1,0 +1,56 @@
+Name     Trab1 ;
+PartNo   00 ;
+Date     15-09-2008 ;
+Revision 01 ;
+Designer Engineer ;
+Company  isel ;
+Assembly None ;
+Location  ;
+Device   v750c ;
+
+/* *************** INPUT PINS *********************/
+PIN     1=CLK                         ; /*                                 */ 
+PIN	 2=MA;
+PIN     3=MB                         ; /*                                 */ 
+PIN     4=MC                         ; /*                                 */ 
+PIN     5=MD                         ; /*                                 */ 
+/* *************** OUTPUT PINS *********************/
+PIN     14=Q0                         ; /*                                 */ 
+PIN     15=Q1                         ; /*                                 */ 
+PIN     16=Q2                         ; /*                                 */ 
+PIN     17=Q3                         ; /*                                 */      
+PIN     18=!A                         ; /*                                 */ 
+PIN     19=!B                         ; /*                                 */ 
+PIN     20=!C                         ; /*                                 */ 
+PIN     21=!D                         ; /*                                 */ 
+PIN     22=!SM                         ; /*                                 */ 
+
+Q0.ckmux=CLK;
+Q1.ckmux=CLK;
+Q2.ckmux=CLK;
+Q3.ckmux=CLK;
+
+
+E0 = MA & MB & MC & MD;
+!E1 = !SM;
+SM = (MA & !Q2 & !Q3) # (MB & Q2 & !Q3) # (MC & !Q2 & Q3) # (MD & Q2 & Q3);
+A = !Q0 & !Q1;
+B = Q0 & !Q1;
+C = !Q0 & Q1;
+D = Q0 & Q1;
+
+Q0.AR='b'0;
+Q1.AR='b'0;
+Q2.AR='b'0;
+Q3.AR='b'0;
+Q0.SP='b'0;
+Q1.SP='b'0;
+Q2.SP='b'0;
+Q3.SP='b'0;
+
+
+Q0.d = Q0 $ E0;
+Q1.d = Q1 $ (Q0 & E0);
+
+Q2.d = Q2 $ E1;
+Q3.d = Q3 $ (Q2 & E1);

@@ -1,0 +1,71 @@
+Name     ASM-CONTROLO ;
+PartNo   00 ;
+Date     25-11-2007 ;
+Revision 01 ;
+Designer Engineer ;
+Company  scp ;
+Assembly None ;
+Location  ;
+Device   v750c ;
+
+/* *************** INPUT PINS *********************/
+PIN    1 = CLK                        ; /*                                 */ 
+PIN    2 = KVAL                        ; /*                                 */ 
+PIN    3 = EQUAL                        ; /*                                 */ 
+PIN    4 = EMPTY                        ; /*                                 */ 
+PIN    5 = FULL                        ; /*                                 */ 
+PIN    6 = TXRDY                        ; /*                                 */ 
+
+/* *************** OUTPUT PINS *********************/
+PIN    14 = OE                        ; /*                                 */ 
+PIN    15 = RD                        ; /*                                 */ 
+PIN    16 = PG                        ; /*                                 */ 
+PIN    17 = LOAD                        ; /*                                 */ 
+PIN    18 = WR                        ; /*                                 */ 
+PIN    19 = NEXTP                        ; /*                                 */ 
+PIN    20 = Q0                        ; /*                                 */ 
+PIN    21 = Q1                        ; /*                                 */ 
+PIN    22 = Q2                        ; /*                                 */ 
+
+
+[Q0..2].sp='b'0;
+[Q0..2].ar='b'0;
+[Q0..2].ckmux=CLK;
+
+SEQUENCE [Q2,Q1,Q0]{
+
+	PRESENT 0
+	IF !KVAL & TXRDY & !EQUAL NEXT 1;
+	IF !KVAL & TXRDY & EQUAL & !EMPTY NEXT 1;
+	IF KVAL & !EQUAL NEXT 4;
+	IF KVAL & EQUAL & !FULL NEXT 4;
+	DEFAULT NEXT 0;
+
+	PRESENT 1
+	OUT OE;
+	NEXT 3;
+
+	PRESENT 3
+	OUT OE,RD,PG;
+	NEXT 7;
+
+	PRESENT 7
+	OUT OE,RD,LOAD,PG;
+	NEXT 6;
+
+	PRESENT 6
+	OUT NEXTG,COUNT,PG;
+	NEXT 0;
+
+	PRESENT 4
+	OUT OE,WR,WAIT;
+	NEXT 5;
+
+	PRESENT 5
+	OUT NEXTP,WRITTED,COUNT,WAIT;
+	IF TXRDY NEXT 1;
+	DEFAULT NEXT 0;
+
+}
+
+

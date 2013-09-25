@@ -1,0 +1,61 @@
+Name     UpDown ;
+PartNo   00 ;
+Date     22-09-2009 ;
+Revision 01 ;
+Designer Engineer ;
+Company  CCISEL ;
+Assembly None ;
+Location  ;
+Device   p22v10 ;
+
+
+PIN 1 = MCLK;
+PIN 2 = CLKP;
+PIN 3 = CLKG;
+
+
+PIN 15 = C1;
+PIN 16 = C2;
+PIN 17 = G0;
+PIN 18 = G1;
+PIN 19 = G2;
+PIN 20 = C0;
+
+
+
+[C0..2]ckmux= MCLK;
+[C0..2].ar='b'0;
+[C0..2].sp='b'0;
+
+
+C0.d=!C0 $ !CLKP;
+C1.d=(C1$C0)&CLKP# C1.dfb & !CLKP ;
+C2.d=(C2 $ (C1&C0))&CLKP# C2.dfb&!CLKP ;
+
+[G0..2].ckmux= MCLK;
+[G0..2].ar='b'0;
+[G0..2].sp='b'0;
+
+G0=!G0 $ !CLKG;
+G1=(G1$G0) & CLKG # G1.dfb&!CLKG;
+G2=(G2$(G1&G0))&CLKG # G2.dfb& !CLKG;
+
+
+
+
+
+
+
+
+/*
+[P0..2].ck=COUNT;
+[P0..2].ar='b'0;
+[P0..2].sp='b'0;
+
+P0.d =!P0;
+P1.d=(P0$P1$UP);
+P2.d=((((P1&P0)$P2)&!UP)#(((!P1&!P0)$P2)&UP));
+
+EMPTY = !P2&!P1&!P0;
+FULL = P2&P1&P0;
+*/

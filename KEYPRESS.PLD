@@ -1,0 +1,43 @@
+Name     KEYPRESS ;
+PartNo   00 ;
+Date     16-11-2007 ;
+Revision 01 ;
+Designer Engineer ;
+Company  isel ;
+Assembly None ;
+Location  ;
+Device   V750c ;
+
+/* *************** INPUT PINS *********************/
+PIN     1 = CLK                         ; /*                                 */ 
+PIN     2 = KVAL                        ; /*                                 */ 
+PIN	 3 = WRITTED;
+/* *************** OUTPUT PINS *********************/
+PIN    14 = WAIT                         ; /*                                 */ 
+PIN    15 = BUTTON                        ; /*                                 */ 
+
+
+/* *************** PINNODES *************************/
+PINNODE 	30 = Q0;
+PINNODE 	31 = Q1;
+
+[Q0..1].sp='b'0;
+[Q0..1].ar='b'0;
+[Q0..1].ckmux=CLK;
+
+
+SEQUENCE [Q1,Q0]{
+	
+	PRESENT 0
+		IF KVAL NEXT 1;
+		DEFAULT NEXT 0;
+	PRESENT 1
+		OUT WAIT,BUTTON; 
+		IF WRITTED NEXT 3;
+		DEFAULT NEXT 1;
+
+	PRESENT 3
+		IF !KVAL NEXT 0;
+		DEFAULT NEXT 3;
+}
+

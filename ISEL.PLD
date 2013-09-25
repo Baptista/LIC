@@ -1,0 +1,105 @@
+Name     ISEL ;
+PartNo   00 ;
+Date     22-11-2007 ;
+Revision 01 ;
+Designer Engineer ;
+Company  Atmel ;
+Assembly None ;
+Location  ;
+Device   v750c ;
+
+/* *************** INPUT PINS *********************/
+PIN     1 = CLK                        ; /*                                 */ 
+PIN     2 = NEXTP                        ; /*                                 */ 
+PIN     3 = NEXTG                        ; /*                                 */ 
+PIN	 4 = PG;
+PIN	 5 = COUNT;
+PIN	 6 = KVAL;
+PIN	 7 = WRITTED;
+
+/* *************** OUTPUT PINS *********************/
+PIN    14 =  EMPTY                    ; /*                                 */ 
+PIN    15 =  FULL                      ; /*                                 */ 
+PIN    16 =  ADRESSE0                     ; /*                                 */ 
+PIN    17 =  ADRESSE1                       ; /*                                 */ 
+PIN    18 =  ADRESSE2                    ; /*                                 */ 
+PIN    19 =  EQUAL                       ; /*                                 */ 
+PIN	20 =  BUTTON;
+PIN	21 =	P2;
+PIN	22 = 	WAIT;
+PIN	23 = 	G2;
+/* *************** PINNODES    *********************/
+
+PINNODE	25 = Q0;
+PINNODE	26 = Q1;
+PINNODE	27 = C0;	
+PINNODE	28 = C1;
+PINNODE	29 = C2;
+PINNODE	30 = C3;
+PINNODE	34 = P0;
+PINNODE	32 = G0;
+PINNODE	33 = P1;
+PINNODE	31 = G1;
+
+
+[Q0..1].ar='b'0;
+[Q0..1].sp='b'0;
+[Q0..1].ckmux=CLK;
+
+
+[C0..3].sp='b'0;
+[C0..3].ar='b'0;
+[C0..3].ck=COUNT;
+
+[P0..2].ar='b'0;
+[P0..2].sp='b'0;
+[P0..2].ckmux=CLK;
+
+[G0..2].ar='b'0;
+[G0..2].sp='b'0;
+[G0..2].ckmux=CLK;
+
+
+
+P0.d = ( P0 $ NEXTP );
+P1.d = ( P1 $ ( P0 & NEXTP ) );
+P2.d = ( P2 $ ( P1 & P0 & NEXTP) );
+
+
+G0.d = (G0 $ NEXTG );
+G1.d = (G1 $ ( G0 & NEXTG ) );
+G2.d = (G2 $ ( G1 & G0 & NEXTG) );
+
+
+
+EQUAL = ( ( !P0 $ G0 ) & ( !P1 $ G1 ) & ( !P2 $ G2 ) );
+
+
+ADRESSE0 = ( ( !PG & P0 ) # ( PG & G0 ) );
+ADRESSE1 = ( ( !PG & P1 ) # ( PG & G1 ) );
+ADRESSE2 = ( ( !PG & P2 ) # ( PG & G2 ) );
+
+C0.d = ( !C0 );
+C1.d = ( C0 $ PG $ C1 ); 
+C2.d = ( (C2 $ (C1 & C0) ) & !PG ) # ( (C2 $ ( !(C1 # C0) )  ) & PG);
+C3.d = ( (C3 $ (C2 & C1 & C0) ) & !PG ) # ( (C3 $ ( !(C2 # C1 # C0 ) )  ) & PG);
+
+EMPTY = (!C0 & !C1 & !C2 & !C3);
+FULL = ( C3 & !C2 & !C1 & !C0 );
+
+SEQUENCE [Q0,Q1]{
+	
+	PRESENT 0
+	IF KVAL NEXT 2;
+	DEFAULT NEXT 0;
+
+	PRESENT 2
+	OUT WAIT,BUTTON;
+	IF WRITTED NEXT 3;
+	DEFAULT NEXT 2;
+
+	PRESENT 3
+	IF !KVAL NEXT 0;
+	DEFAULT NEXT 3;
+
+}

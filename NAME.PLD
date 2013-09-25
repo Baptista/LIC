@@ -1,0 +1,57 @@
+Name     Cont ;
+PartNo   00 ;
+Date     22-09-2008 ;
+Revision 01 ;
+Designer Engineer ;
+Company  CCISEL ;
+Assembly None ;
+Location  ;
+Device   v750C ;
+
+/* *************** INPUT PINS *********************/
+PIN 1 = clk;
+PIN [2..5] = [M0..3];
+
+/* *************** OUTPUT PINS *********************/
+PIN [14..17] = ![D0..3];
+PIN 18 = S;
+PIN [19..22] = [X0..3];
+
+
+/* BODY */
+
+/* COUNT */
+
+E1 = M0 & M1 & M2 & M3;
+E2 = S;
+
+X0.ar = 'b'0 ;
+X0.sp = 'b'0 ;
+X1.ar = 'b'0 ;
+X1.sp = 'b'0 ;
+X2.ar = 'b'0 ;
+X2.sp = 'b'0 ;
+X3.ar = 'b'0 ;
+X3.sp = 'b'0 ;
+
+X0.ckmux = clk;
+X1.ckmux = clk;
+X2.ckmux = clk;
+X3.ckmux = clk;
+
+X0.d = X0 $ E1;
+X1.d = (X0 & E1) $ X1;
+
+X2.d = X2 $ E2;
+X3.d = (X2 & E2) $ X3;
+
+/* DEC */
+
+D0 = !X2 & !X3;
+D1 = !X2 & X3;
+D2 = X2 & !X3;
+D3 = X2 & X3;
+
+/* Mux */
+
+S = ( M0 & !X0 & !X1 ) # ( M1 & X0 & !X1 ) # ( M2 & !X0 & X1 ) # ( M3 & X0 & X1 );

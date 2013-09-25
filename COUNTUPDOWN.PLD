@@ -1,0 +1,29 @@
+Name     COUNTUPDOWN ;
+PartNo   00 ;
+Date     23-11-2007 ;
+Revision 01 ;
+Designer Engineer ;
+Company  scp ;
+Assembly None ;
+Location  ;
+Device   v750c ;
+
+/* *************** INPUT PINS *********************/
+PIN    1 = CLK                        ; /*                                 */ 
+PIN    2 = PG                        ; /*                                 */ 
+
+/* *************** OUTPUT PINS *********************/
+
+PIN    14 = C0                        ; /*                                 */ 
+PIN    15 = C1                        ; /*                                 */ 
+PIN    16 = C2                        ; /*                                 */ 
+
+
+[C0..2].ar='b'0;
+[C0..2].sp='b'0;
+[C0..2].ckmux=CLK;
+
+
+C0.d = !C0;
+C1.d = C0 $ PG $ C1 ; 
+C2.d = ( (C2 $ (C1 & C0) ) & !PG ) # ( (C2 $ ( !(C1 # C0) )  ) & PG);

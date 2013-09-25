@@ -1,0 +1,107 @@
+Name     CONTROLOTOTAL ;
+PartNo   00 ;
+Date     16-11-2007 ;
+Revision 01 ;
+Designer Engineer ;
+Company  isel ;
+Assembly None ;
+Location  ;
+Device   v750c ;
+
+/* *************** INPUT PINS *********************/
+PIN     1 = CLK                        ; /*                                 */ 
+PIN     2 = KVAL                        ; /*                                 */ 
+PIN     3 = TXRDY                        ; /*                                 */ 
+PIN     4 = P0                        ; /*                                 */ 
+PIN     5 = P1                        ; /*                                 */ 
+PIN     6 = P2                        ; /*                                 */ 
+PIN     7 = G0                        ; /*                                 */ 
+PIN     8 = G1                        ; /*                                 */ 
+PIN     9 = G2                        ; /*                                 */ 
+
+/* *************** OUTPUT PINS *********************/
+PIN     14 = WAIT                       ; /*                                 */ 
+PIN     15 = !OE                        ; /*                                 */ 
+PIN     16 = !RD                        ; /*                                 */ 
+PIN     17 = !WR                        ; /*                                 */ 
+PIN     18 = LD                        ; /*                                 */ 
+PIN     19 = !NEXTG                        ; /*                                 */ 
+PIN     20 = !NEXTP                        ; /*                                 */ 
+PIN     21 = !PG                        ; /*                                 */ 
+PIN 	 22 = EQUALTOTAL;
+PIN 	 23 = ANT;
+
+
+/* *************** PINNODES    *********************/
+PINNODE     32 =  Q0                    ; /*                                 */ 
+PINNODE     33 =  Q1                    ; /*                                 */ 
+PINNODE     34 =  Q2                    ; /*                                 */ 
+PINNODE     35 =  Q3                    ; /*                                 */ 
+/*PINNODE     36 =  EQUAL0;
+PINNODE     37 =  EQUAL1;
+PINNODE     38 =  EQUAL2;*/
+
+
+EQUAL0 = ( !P0$G0 );
+EQUAL1 = ( !P1$G1 );
+EQUAL2 = ( !P2$G2 );
+EQUALTOTAL = EQUAL0 & EQUAL1 & EQUAL2;
+
+
+[Q0..3].ar='b'0;
+[Q0..3].sp='b'0;
+
+
+SEQUENCE [Q3]{
+	
+	PRESENT 0
+		IF KVAL NEXT 1;
+		DEFAULT NEXT 0;
+	PRESENT 1
+		IF !KVAL NEXT 0;
+		DEFAULT NEXT 1;
+
+}
+
+
+SEQUENCE [Q2,Q1,Q0]{
+
+	PRESENT 0
+		IF !KVAL & TXRDY & (!EQUALTOTAL) NEXT 1;
+		IF !KVAL & TXRDY & (EQUALTOTAL) & ANT NEXT 1;
+		IF KVAL & (!EQUALTOTAL) NEXT 4;
+		IF KVAL & EQUALTOTAL & !ANT NEXT 4;
+		DEFAULT NEXT 0;
+	
+	PRESENT 1
+		OUT OE;
+
+	PRESENT 3
+		OUT OE,RD,LD,PG;
+		
+	PRESENT 7
+		OUT NEXTG;
+
+	PRESENT 4
+		OUT OE;
+
+	PRESENT 5
+		OUT WR,PG;
+			
+	PRESENT 6
+		OUT NEXTP,ANT;
+		IF TXRDY & (!EQUALTOTAL) NEXT 1;
+		IF TXRDY & (EQUALTOTAL) & ANT NEXT 1;
+		DEFAULT NEXT 0;	
+		
+
+
+}
+
+
+
+
+
+
+
+

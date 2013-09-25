@@ -1,0 +1,80 @@
+Name     CONTROLO ;
+PartNo   00 ;
+Date     13-11-2007 ;
+Revision 01 ;
+Designer Engineer ;
+Company  CCISEL ;
+Assembly None ;
+Location  ;
+Device   v750c ;
+
+/* *************** INPUT PINS *********************/
+PIN    1 = CLK                         ; /*                                 */ 
+PIN    3 = TXRDY                        ; /*                                 */ 
+PIN	4 = EQUAL;
+PIN	5 = FULL;
+PIN	6 = EMPTY;
+PIN	7 = BUTTON;
+
+/* *************** OUTPUT PINS *********************/
+PIN	14 = WRITTED;
+PIN	15 = !RD;
+PIN	16 = !WR;
+PIN	17 = NEXTP;
+PIN	18 = NEXTG;
+PIN	20 = !OE; 
+PIN 	21 = COUNT;
+PIN	22 = PG;
+PIN	23 = LOAD;
+
+/* *************** PINNODES    *********************/
+
+PINNODE 28 = Q0;
+PINNODE 29 = Q1;
+PINNODE 30 = Q2;
+
+
+[Q0..2].sp='b'0;
+[Q0..2].ar='b'0;
+[Q0..2].ckmux=CLK;
+
+
+
+SEQUENCE [Q2,Q1,Q0]{
+
+	PRESENT 0
+	IF !BUTTON & TXRDY & !EQUAL NEXT 1;
+	IF !BUTTON & TXRDY & EQUAL & !EMPTY NEXT 1;
+	IF BUTTON & !EQUAL NEXT 4;
+	IF BUTTON & EQUAL & !FULL NEXT 4;
+	DEFAULT NEXT 0;
+
+	PRESENT 1
+	OUT PG;
+	NEXT 3;
+
+	PRESENT 3
+	OUT PG,RD;
+	NEXT 7;
+
+	PRESENT 7
+	OUT PG,RD,LOAD;
+	NEXT 6;
+
+	PRESENT 6
+	OUT NEXTG,COUNT,PG;
+	NEXT 0;
+
+	PRESENT 4
+	OUT OE,WR;
+	NEXT 5;
+
+	PRESENT 5
+	OUT NEXTP,COUNT,WRITTED;
+	IF TXRDY NEXT 1;
+	DEFAULT NEXT 0;
+
+}
+
+
+
